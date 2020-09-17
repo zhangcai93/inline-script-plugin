@@ -27,7 +27,7 @@ class InlineScriptPlugin {
 
 
     const splitChunks = compiler.options.optimization.splitChunks
-    compiler.options.optimization.splitChunks = modifySplitChunks(splitChunks)
+    compiler.options.optimization.splitChunks = modifySplitChunks(splitChunks, this.name)
 
     // HtmlWebpackPlugin version 4.0.0-beta.5
     const HtmlWebpackPlugin = require('html-webpack-plugin')
