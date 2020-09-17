@@ -1,12 +1,12 @@
 const {
   getHeadAndBodyChunks,
   inlineScript,
-  addEntryPoint
+  addEntryPoint,
+  modifySplitChunks
 } = require('./lib/utils.js')
 
 class InlineScriptPlugin {
   constructor(options = {}) {
-    console.log('TestWebpackPlugin=======options:', options)
     const { name, path, inhead = false } = options
     if (!name || !path) {
       const message = 'either reuqired options name or path did not pass'
@@ -24,6 +24,10 @@ class InlineScriptPlugin {
     const originEntry = compiler.options.entry
     const finalEntry = addEntryPoint(originEntry, this.entryPoint)
     compiler.options.entry = finalEntry
+
+
+    const splitChunks = compiler.options.optimization.splitChunks
+    compiler.options.optimization.splitChunks = modifySplitChunks(splitChunks)
 
     // HtmlWebpackPlugin version 4.0.0-beta.5
     const HtmlWebpackPlugin = require('html-webpack-plugin')
@@ -54,7 +58,7 @@ class InlineScriptPlugin {
         )
       })
     } else {
-      // HtmlWebpackPlugin version 3.2.0
+      // HtmlWebpackPlugin version 3.2.x
       compiler.plugin('compilation', compilation => {
         compilation.plugin('html-webpack-plugin-alter-asset-tags', data => {
           const tags = [...data.body, ...data.head]
