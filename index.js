@@ -1,18 +1,19 @@
 const {
   getHeadAndBodyChunks,
-  inlineScript,
+  getInlineChunks,
   addEntryPoint,
   modifySplitChunks
 } = require('./lib/utils.js')
 
 class InlineScriptPlugin {
   constructor(options = {}) {
-    const { name, path, inhead = false } = options
+    const { name, path, inhead = false, inline = false} = options
     if (!name || !path) {
       const message = 'either reuqired options name or path did not pass'
       throw new Error(message)
     }
     this.name = inhead ? `${name}_inhead` : name
+    this.inline = inline
     this.entryPoint = {
       [this.name]: Array.isArray(path) ? path : [path]
     }
@@ -37,18 +38,9 @@ class InlineScriptPlugin {
           selfName,
           (data, callback) => {
             const tags = [...data.bodyTags, ...data.headTags]
-            const chunks = getHeadAndBodyChunks(tags)
+            const chunks = getHeadAndBodyChunks(tags, this.name)
 
-            const headChunks = inlineScript(
-              compilation,
-              chunks.headChunks,
-              this.name
-            )
-            const bodyChunks = inlineScript(
-              compilation,
-              chunks.bodyChunks,
-              this.name
-            )
+            const { headChunks, bodyChunks } = getInlineChunks(chunks, this.name, this.inline)
 
             data.headTags = headChunks
             data.bodyTags = bodyChunks
@@ -63,18 +55,10 @@ class InlineScriptPlugin {
         compilation.plugin('html-webpack-plugin-alter-asset-tags', data => {
           const tags = [...data.body, ...data.head]
           // _inhead后缀script添加到头部
-          const chunks = getHeadAndBodyChunks(tags)
+          const chunks = getHeadAndBodyChunks(tags, this.name)
           // 转为inline形式
-          const headChunks = inlineScript(
-            compilation,
-            chunks.headChunks,
-            this.name
-          )
-          const bodyChunks = inlineScript(
-            compilation,
-            chunks.bodyChunks,
-            this.name
-          )
+          const { headChunks, bodyChunks } = getInlineChunks(chunks, this.name, this.inline)
+      
           data.head = headChunks
           data.body = bodyChunks
         })
