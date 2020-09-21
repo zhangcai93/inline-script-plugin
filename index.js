@@ -40,7 +40,7 @@ class InlineScriptPlugin {
             const tags = [...data.bodyTags, ...data.headTags]
             const chunks = getHeadAndBodyChunks(tags, this.name)
 
-            const { headChunks, bodyChunks } = getInlineChunks(chunks, this.name, this.inline)
+            const { headChunks, bodyChunks } = getInlineChunks(compilation, chunks, this.name, this.inline)
 
             data.headTags = headChunks
             data.bodyTags = bodyChunks
@@ -57,7 +57,7 @@ class InlineScriptPlugin {
           // _inhead后缀script添加到头部
           const chunks = getHeadAndBodyChunks(tags, this.name)
           // 转为inline形式
-          const { headChunks, bodyChunks } = getInlineChunks(chunks, this.name, this.inline)
+          const { headChunks, bodyChunks } = getInlineChunks(compilation, chunks, this.name, this.inline)
       
           data.head = headChunks
           data.body = bodyChunks
